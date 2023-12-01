@@ -1,20 +1,16 @@
 import { NavigationContainer } from '@react-navigation/native';
-import AppNavigator from './navigation/AppNavigator'; // Asegúrate de que AppNavigator es el nombre correcto del archivo
+import { MqttProvider } from './contexts/MqttContext';
+import AppNavigator from './navigation/AppNavigator';
 import { StyleSheet, View } from 'react-native';
 
-export default function App() {
+const App = () => {
   return (
-    <NavigationContainer>
-      <AppNavigator />
-    </NavigationContainer>
+    <MqttProvider>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </MqttProvider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
