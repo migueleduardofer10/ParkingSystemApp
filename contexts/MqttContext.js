@@ -30,10 +30,15 @@ export const MqttProvider = ({ children }) => {
     };
 
     const onConnectionLost = responseObject => {
-      if (responseObject.errorCode !== 0) {
-        console.log("onConnectionLost:" + responseObject.errorMessage);
-      }
-    };
+        if (responseObject.errorCode !== 0) {
+          console.log("onConnectionLost:" + responseObject.errorMessage);
+          // Implementar lógica de reconexión aquí
+          setTimeout(() => {
+            client.connect({ onSuccess: onConnect, useSSL: true });
+          }, 10); // Reintentar después de 3 segundos, por ejemplo
+        }
+      };
+      
 
     const onMessageArrived = message => {
       console.log("Mensaje MQTT recibido:", message.payloadString);
