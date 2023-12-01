@@ -33,21 +33,30 @@ const ParkingTab = ({ tabName }) => {
     };
 
     const onMessageArrived = message => {
-      console.log("onMessageArrived:" + message.payloadString);
-      const messageStr = message.payloadString;
-      const allSlotsStatus = messageStr.split(',').map(status => status === '255'); // '255' es ocupado
-
-      let slotsToShow;
-      if (tabName === 'Parking 1') {
-        slotsToShow = allSlotsStatus.slice(0, 3);
+      console.log("Mensaje MQTT recibido:", message.payloadString);
+      const messageStr = message.payloadString.trim();
+      const messageParts = messageStr.split(',');
+    
+      // Verifica si el mensaje tiene exactamente 6 partes y cada parte es un número
+      if (messageParts.length === 6 && messageParts.every(part => !isNaN(part))) {
+        const allSlotsStatus = messageParts.map(status => status === '255');
+        console.log("Estado de todos los slots:", allSlotsStatus);
+    
+        let slotsToShow;
+        if (tabName === 'Parking 1') {
+          slotsToShow = allSlotsStatus.slice(0, 3);
+        } else {
+          slotsToShow = allSlotsStatus.slice(3, 6);
+        }
+    
+        setSlots(slotsToShow);
       } else {
-        slotsToShow = allSlotsStatus.slice(3, 6);
       }
-
-      setSlots(prevSlots => {
-        return prevSlots.map((slot, index) => slotsToShow[index] !== undefined ? slotsToShow[index] : slot);
-      });
     };
+    
+    
+    
+    
 
     // Configurar manejadores de eventos
     client.onConnectionLost = onConnectionLost;
@@ -67,13 +76,22 @@ const ParkingTab = ({ tabName }) => {
     <View style={styles.container}>
       <Text style={styles.title}>{tabName}</Text>
       {slots.map((occupied, index) => (
-        <View key={index} style={[styles.led, occupied ? styles.ledOn : styles.ledOff]} />
+        <View style={styles.slotContainer} key={index}>
+          <View style={[styles.led, occupied ? styles.ledOn : styles.ledOff]} />
+          <Text style={styles.slotText}>Slot {index + 1}</Text>
+        </View>
       ))}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  slotContainer: {
+    alignItems: 'center',
+  },
+  slotText: {
+    marginTop: 3,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
